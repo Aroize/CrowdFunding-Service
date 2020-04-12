@@ -6,6 +6,7 @@ import ru.ifmo.server.data.repositories.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class UserServiceImpl implements UserService {
@@ -23,10 +24,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> findAllByLogin(String login) {
-        ArrayList<User> result = new ArrayList<>();
-        userRepository.findAllByLogin(login).forEach(result::add);
-        return result;
+    public User findByLogin(String login) {
+        Optional<User> user = userRepository.findByLogin(login);
+        return user.orElse(null);
     }
 
     @Override

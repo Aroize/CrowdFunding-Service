@@ -6,8 +6,8 @@ import javax.persistence.*;
 @Table(name = "users", schema = "public")
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "users_id_seq")
+    private int id;
 
     @Column(name = "login")
     private String login;

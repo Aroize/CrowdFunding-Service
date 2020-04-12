@@ -8,7 +8,7 @@ public interface UserService {
 
     List<User> findAll();
 
-    List<User> findAllByLogin(String login);
+    User findByLogin(String login);
 
     List<User> findById(int id);
 
