@@ -1,4 +1,4 @@
-package ru.ifmo.server.auth;
+package ru.ifmo.server.auth.access;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -6,6 +6,7 @@ import ru.ifmo.server.data.entities.User;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Optional;
 
 @Component
 public class AccessManagerImpl implements AccessManager {
@@ -14,8 +15,11 @@ public class AccessManagerImpl implements AccessManager {
 
     private static final long EXPIRES_AFTER = ONE_MINUTE * 30;
 
-    @Autowired
-    private AccessTokenService accessTokenService;
+    private final AccessTokenService accessTokenService;
+
+    public AccessManagerImpl(AccessTokenService accessTokenService) {
+        this.accessTokenService = accessTokenService;
+    }
 
 
     @Override
@@ -26,5 +30,19 @@ public class AccessManagerImpl implements AccessManager {
         accessTokenService.deleteAccessToken(user.getId());
         accessTokenService.save(accessToken);
         return accessToken;
+    }
+
+    @Override
+    public boolean checkAccessToken(String token, int uid) {
+        Optional<AccessToken> accessToken = accessTokenService.findAccessTokenByValue(token, uid);
+        return accessToken.isPresent();
+    }
+
+    @Override
+    public void deleteTokenForUser(String token, int uid) {
+        Optional<AccessToken> accessToken =  accessTokenService.findAccessTokenByValue(token, uid);
+        accessToken.ifPresent(realToken -> {
+            accessTokenService.deleteAccessToken(realToken.getId());
+        });
     }
 }

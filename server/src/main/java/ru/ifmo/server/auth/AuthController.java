@@ -1,13 +1,13 @@
 package ru.ifmo.server.auth;
 
 import com.google.gson.Gson;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.ifmo.server.auth.access.AccessToken;
 import ru.ifmo.server.auth.exception.InvalidPasswordException;
 import ru.ifmo.server.auth.exception.InvalidUserException;
 import ru.ifmo.server.data.entities.User;
@@ -55,5 +55,11 @@ public class AuthController {
             status = HttpStatus.BAD_REQUEST;
         }
         return new ResponseEntity<>(responseBody, status);
+    }
+
+    @GetMapping("/auth.logout")
+    public ResponseEntity<String> logout(@RequestParam(name = "token") String token, @RequestParam(name = "uid") int uid) {
+        authManager.logout(token, uid);
+        return new ResponseEntity<>("{ \"response\" : 1 }", HttpStatus.OK);
     }
 }
