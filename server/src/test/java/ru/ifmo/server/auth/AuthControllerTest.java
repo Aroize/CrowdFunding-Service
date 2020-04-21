@@ -1,9 +1,9 @@
 package ru.ifmo.server.auth;
 
-import com.google.gson.Gson;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
+import ru.ifmo.server.auth.access.AccessToken;
 import ru.ifmo.server.auth.exception.InvalidPasswordException;
 import ru.ifmo.server.auth.exception.InvalidUserException;
 import ru.ifmo.server.data.entities.User;
@@ -16,8 +16,6 @@ public class AuthControllerTest {
     private final AuthManager testAuthManager = new AuthManager() {
 
         private final Map<String, User> userMap = new HashMap<>();
-
-        private final Map<String, AccessToken> accessTokenMap = new HashMap<>();
 
         @Override
         public User signUp(String login, String password) throws InvalidUserException {
@@ -38,6 +36,10 @@ public class AuthControllerTest {
             if (!userMap.get(login).getHashedPassword().equals(password))
                 throw new InvalidPasswordException();
             return null;
+        }
+
+        @Override
+        public void logout(String accessToken, int usedId) {
         }
     };
 
@@ -76,5 +78,10 @@ public class AuthControllerTest {
             assert response.getBody() != null;
             assert response.getBody().contains("2");
         }
+    }
+
+    @Test
+    void testLogout() {
+        //Useless Test
     }
 }

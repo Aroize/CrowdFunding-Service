@@ -1,4 +1,4 @@
-package ru.ifmo.server.auth;
+package ru.ifmo.server.auth.access;
 
 import org.apache.tomcat.util.security.MD5Encoder;
 

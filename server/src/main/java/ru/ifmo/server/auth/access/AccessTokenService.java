@@ -1,4 +1,6 @@
-package ru.ifmo.server.auth;
+package ru.ifmo.server.auth.access;
+
+import java.util.Optional;
 
 public interface AccessTokenService {
     AccessToken findAccessTokenById(int userId);
@@ -6,4 +8,6 @@ public interface AccessTokenService {
     void deleteAccessToken(int userId);
 
     void save(AccessToken accessToken);
+
+    Optional<AccessToken> findAccessTokenByValue(String tokenValue, int userId);
 }

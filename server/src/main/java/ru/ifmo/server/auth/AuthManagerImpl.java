@@ -2,6 +2,8 @@ package ru.ifmo.server.auth;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.ifmo.server.auth.access.AccessManager;
+import ru.ifmo.server.auth.access.AccessToken;
 import ru.ifmo.server.auth.exception.InvalidPasswordException;
 import ru.ifmo.server.auth.exception.InvalidUserException;
 import ru.ifmo.server.data.entities.User;
@@ -10,11 +12,14 @@ import ru.ifmo.server.data.services.UserService;
 @Component
 public class AuthManagerImpl implements AuthManager {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @Autowired
-    private AccessManager accessManager;
+    private final AccessManager accessManager;
+
+    public AuthManagerImpl(UserService userService, AccessManager accessManager) {
+        this.userService = userService;
+        this.accessManager = accessManager;
+    }
 
     @Override
     public User signUp(String login, String password) throws InvalidUserException {
@@ -38,5 +43,10 @@ public class AuthManagerImpl implements AuthManager {
             throw new InvalidPasswordException();
         }
         return accessManager.registerTokenForUser(user);
+    }
+
+    @Override
+    public void logout(String accessToken, int usedId) {
+        accessManager.deleteTokenForUser(accessToken, usedId);
     }
 }

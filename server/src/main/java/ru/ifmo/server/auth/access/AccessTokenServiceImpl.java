@@ -1,13 +1,21 @@
-package ru.ifmo.server.auth;
+package ru.ifmo.server.auth.access;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.ifmo.server.auth.access.AccessToken;
+import ru.ifmo.server.auth.access.AccessTokenRepository;
+import ru.ifmo.server.auth.access.AccessTokenService;
+
+import java.util.Optional;
 
 @Component
 public class AccessTokenServiceImpl implements AccessTokenService {
 
-    @Autowired
-    private AccessTokenRepository accessTokenRepository;
+    private final AccessTokenRepository accessTokenRepository;
+
+    public AccessTokenServiceImpl(AccessTokenRepository accessTokenRepository) {
+        this.accessTokenRepository = accessTokenRepository;
+    }
 
     @Override
     public AccessToken findAccessTokenById(int userId) {
@@ -26,5 +34,10 @@ public class AccessTokenServiceImpl implements AccessTokenService {
     @Override
     public void save(AccessToken accessToken) {
         accessTokenRepository.save(accessToken);
+    }
+
+    @Override
+    public Optional<AccessToken> findAccessTokenByValue(String tokenValue, int userId) {
+        return accessTokenRepository.findAccessTokenByAccessTokenAndUserId(tokenValue, userId);
     }
 }
