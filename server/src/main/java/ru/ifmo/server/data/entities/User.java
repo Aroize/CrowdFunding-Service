@@ -3,7 +3,7 @@ package ru.ifmo.server.data.entities;
 import javax.persistence.*;
 
 @Entity()
-@Table(name = "users", schema = "public")
+@Table(name = "users", schema = "crowdfunding")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "users_id_seq")

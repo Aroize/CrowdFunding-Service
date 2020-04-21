@@ -7,7 +7,7 @@ import java.nio.ByteBuffer;
 import java.util.Date;
 
 @Entity
-@Table(name = "access_tokens")
+@Table(name = "access_tokens", schema = "crowdfunding")
 public class AccessToken {
 
     @Id

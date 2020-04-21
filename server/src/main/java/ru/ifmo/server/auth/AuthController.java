@@ -17,7 +17,7 @@ import java.util.List;
 @Component
 public class AuthController {
 
-    private Gson gson = new Gson();
+    private final Gson gson = new Gson();
 
     @Autowired
     private AuthManager authManager;
