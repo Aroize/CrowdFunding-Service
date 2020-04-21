@@ -8,10 +8,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.ifmo.server.auth.exception.InvalidPasswordException;
+import ru.ifmo.server.auth.exception.InvalidUserException;
 import ru.ifmo.server.data.entities.User;
-import ru.ifmo.server.data.services.UserService;
-
-import java.util.List;
 
 @RestController
 @Component
@@ -24,19 +23,34 @@ public class AuthController {
 
     @GetMapping("/auth.signUp")
     public ResponseEntity<String> signUp(@RequestParam(name = "login") String login, @RequestParam(name = "hashed_pwd") String password) {
-        User user = authManager.signUp(login, password);
-        if (user == null) {
-            return new ResponseEntity<>("{ \"error_code\" : 1, \"failure_msg\" : \"User with this login already exists\"  }", HttpStatus.CONFLICT);
+        String responseBody;
+        HttpStatus status;
+        try {
+            User user = authManager.signUp(login, password);
+            responseBody = gson.toJson(user);
+            status = HttpStatus.OK;
+        } catch (InvalidUserException e) {
+            responseBody = "{ \"error_code\" : 1, \"failure_msg\" : \"User with this login already exists\"  }";
+            status = HttpStatus.CONFLICT;
         }
-        return new ResponseEntity<>(gson.toJson(user), HttpStatus.OK);
+        return new ResponseEntity<>(responseBody, status);
     }
 
     @GetMapping("/auth.signIn")
     public ResponseEntity<String> signIn(@RequestParam(name = "login") String login, @RequestParam(name = "hashed_pwd") String password) {
-        AccessToken accessToken = authManager.signIn(login, password);
-        if (accessToken == null) {
-            return new ResponseEntity<>("{ \"error_code\" : 2, \"failure_msg\" : \"Bad password or no such user\"  }", HttpStatus.BAD_REQUEST);
+        String responseBody;
+        HttpStatus status;
+        try {
+            AccessToken accessToken = authManager.signIn(login, password);
+            responseBody = gson.toJson(accessToken);
+            status = HttpStatus.OK;
+        } catch (InvalidPasswordException e) {
+            responseBody = "{\"error_code\" : 1, \"failure_msg\" : \"Password is incorrect\"}";
+            status = HttpStatus.BAD_REQUEST;
+        } catch (InvalidUserException e) {
+            responseBody = "{\"error_code\" : 2, \"failure_msg\" : \"No such user\"}";
+            status = HttpStatus.BAD_REQUEST;
         }
-        return new ResponseEntity<>(gson.toJson(accessToken), HttpStatus.OK);
+        return new ResponseEntity<>(responseBody, status);
     }
 }
