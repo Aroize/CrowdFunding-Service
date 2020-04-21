@@ -18,8 +18,11 @@ public class AuthController {
 
     private final Gson gson = new Gson();
 
-    @Autowired
-    private AuthManager authManager;
+    private final AuthManager authManager;
+
+    public AuthController(AuthManager authManager) {
+        this.authManager = authManager;
+    }
 
     @GetMapping("/auth.signUp")
     public ResponseEntity<String> signUp(@RequestParam(name = "login") String login, @RequestParam(name = "hashed_pwd") String password) {
