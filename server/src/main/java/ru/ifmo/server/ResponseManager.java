@@ -31,13 +31,18 @@ public class ResponseManager {
             HttpStatus.OK
     );
 
+    public final static ResponseEntity<String> tokenExpiredResponse = new ResponseEntity<>(
+            "{ " + jsonElements.get(JSON_ELEMENTS.ERROR_CODE) + "-1 , " +
+                    jsonElements.get(JSON_ELEMENTS.FAILURE_MSG) + "\"Access token has expired or invalid\" }",
+            HttpStatus.UNAUTHORIZED);
+
     public static <T> ResponseEntity<String> createResponse(T t) {
         final StringBuilder builder = new StringBuilder();
         final String serialized = gson.toJson(t);
         builder.append("{ ");
         builder.append(jsonElements.get(JSON_ELEMENTS.RESPONSE));
         builder.append(serialized);
-        return new ResponseEntity<String>(builder.append(" }").toString(), HttpStatus.OK);
+        return new ResponseEntity<>(builder.append(" }").toString(), HttpStatus.OK);
     }
 
     public static ResponseEntity<String> createResponse(Exception e, int errorCode) {
