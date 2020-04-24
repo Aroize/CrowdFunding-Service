@@ -14,6 +14,9 @@ import ru.ifmo.server.auth.exception.InvalidUserException;
 @Component
 public class BillController {
 
+    private static final String ERROR_CODE = "\"error code\" : ";
+    private static final String FAILURE_MSG = "\"failure_msg\" : ";
+
     private final static ResponseEntity<String> TOKEN_EXPIRED_RESPONSE =
             new ResponseEntity<>("{ \"error_code\" : -1, \"failure_msg\" : \"Access token has expired or invalid\" }", HttpStatus.UNAUTHORIZED);
 
@@ -48,6 +51,35 @@ public class BillController {
             status = HttpStatus.BAD_REQUEST;
         } catch (InvalidBalanceException e) {
             response = "{\"error_code\" : 3, \"failure_msg\" : \"" + e.getMessage() + "\"}";
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return new ResponseEntity<>(response, status);
+    }
+
+    @GetMapping("/bill.donate")
+    public ResponseEntity<String> donate(
+            @RequestParam(name = "token") String tokenValue,
+            @RequestParam int uid,
+            @RequestParam int amount,
+            @RequestParam(name = "fund_id") int fundId
+    ) {
+        if (!accessManager.checkAccessToken(tokenValue, uid)) {
+            return TOKEN_EXPIRED_RESPONSE;
+        }
+        String response;
+        HttpStatus status;
+        try {
+            billService.transactionToFund(uid, amount, fundId);
+            response = String.format(BODY_OK, 1);
+            status = HttpStatus.OK;
+        } catch (InvalidUserException e) {
+            response = "{ " + ERROR_CODE + 2 + ", " + FAILURE_MSG + e.getMessage() + " }";
+            status = HttpStatus.BAD_REQUEST;
+        } catch (InvalidBalanceException e) {
+            response = "{ " + ERROR_CODE + 3 + ", " + FAILURE_MSG + e.getMessage() + " }";
+            status = HttpStatus.BAD_REQUEST;
+        } catch (RuntimeException e) {
+            response = "{ " + ERROR_CODE + 4 + ", " + FAILURE_MSG + e.getMessage() + " }";
             status = HttpStatus.BAD_REQUEST;
         }
         return new ResponseEntity<>(response, status);
