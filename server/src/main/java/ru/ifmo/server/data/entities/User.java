@@ -15,6 +15,8 @@ public class User {
     @Column(name = "hashed_pwd")
     private String hashedPassword;
 
+    private int balance;
+
     public int getId() {
         return id;
     }
@@ -38,4 +40,14 @@ public class User {
     public void setHashedPassword(String hashedPassword) {
         this.hashedPassword = hashedPassword;
     }
+
+    public int getBalance() {
+        return balance;
+    }
+
+    public void setBalance(int bill) {
+        this.balance = bill;
+    }
+
+    public void addAmount(int amount) { this.balance += amount; }
 }

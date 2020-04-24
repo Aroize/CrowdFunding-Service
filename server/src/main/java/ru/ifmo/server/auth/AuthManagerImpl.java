@@ -1,6 +1,5 @@
 package ru.ifmo.server.auth;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.ifmo.server.auth.access.AccessManager;
 import ru.ifmo.server.auth.access.AccessToken;
