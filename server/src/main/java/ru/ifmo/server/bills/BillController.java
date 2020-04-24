@@ -1,11 +1,11 @@
 package ru.ifmo.server.bills;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.ifmo.server.ResponseManager;
 import ru.ifmo.server.auth.access.AccessManager;
 import ru.ifmo.server.auth.exception.InvalidUserException;
 
@@ -13,14 +13,6 @@ import ru.ifmo.server.auth.exception.InvalidUserException;
 @RestController
 @Component
 public class BillController {
-
-    private static final String ERROR_CODE = "\"error code\" : ";
-    private static final String FAILURE_MSG = "\"failure_msg\" : ";
-
-    private final static ResponseEntity<String> TOKEN_EXPIRED_RESPONSE =
-            new ResponseEntity<>("{ \"error_code\" : -1, \"failure_msg\" : \"Access token has expired or invalid\" }", HttpStatus.UNAUTHORIZED);
-
-    private final static String BODY_OK = "{ \"response\" : %d }";
 
     private final BillService billService;
 
@@ -38,22 +30,18 @@ public class BillController {
             @RequestParam int amount
     ) {
         if (!accessManager.checkAccessToken(tokenValue, uid)) {
-            return TOKEN_EXPIRED_RESPONSE;
+            return ResponseManager.tokenExpiredResponse;
         }
-        String response;
-        HttpStatus status;
+        ResponseEntity<String> response;
         try {
             billService.addAmount(uid, amount);
-            response = String.format(BODY_OK, 1);
-            status = HttpStatus.OK;
+            response = ResponseManager.simpleResponse;
         } catch (InvalidUserException e) {
-            response = "{\"error_code\" : 2, \"failure_msg\" : \"" + e.getMessage() + "\"}";
-            status = HttpStatus.BAD_REQUEST;
+            response = ResponseManager.createResponse(e, 2);
         } catch (InvalidBalanceException e) {
-            response = "{\"error_code\" : 3, \"failure_msg\" : \"" + e.getMessage() + "\"}";
-            status = HttpStatus.BAD_REQUEST;
+            response = ResponseManager.createResponse(e, 3);
         }
-        return new ResponseEntity<>(response, status);
+        return response;
     }
 
     @GetMapping("/bill.donate")
@@ -64,25 +52,20 @@ public class BillController {
             @RequestParam(name = "fund_id") int fundId
     ) {
         if (!accessManager.checkAccessToken(tokenValue, uid)) {
-            return TOKEN_EXPIRED_RESPONSE;
+            return ResponseManager.tokenExpiredResponse;
         }
-        String response;
-        HttpStatus status;
+        ResponseEntity<String> response;
         try {
             billService.transactionToFund(uid, amount, fundId);
-            response = String.format(BODY_OK, 1);
-            status = HttpStatus.OK;
+            response = ResponseManager.simpleResponse;
         } catch (InvalidUserException e) {
-            response = "{ " + ERROR_CODE + 2 + ", " + FAILURE_MSG + e.getMessage() + " }";
-            status = HttpStatus.BAD_REQUEST;
+            response = ResponseManager.createResponse(e, 2);
         } catch (InvalidBalanceException e) {
-            response = "{ " + ERROR_CODE + 3 + ", " + FAILURE_MSG + e.getMessage() + " }";
-            status = HttpStatus.BAD_REQUEST;
+            response = ResponseManager.createResponse(e, 3);
         } catch (RuntimeException e) {
-            response = "{ " + ERROR_CODE + 4 + ", " + FAILURE_MSG + e.getMessage() + " }";
-            status = HttpStatus.BAD_REQUEST;
+            response = ResponseManager.createResponse(e, 4);
         }
-        return new ResponseEntity<>(response, status);
+        return response;
     }
 
     @GetMapping("/bill.getBalance")
@@ -91,19 +74,16 @@ public class BillController {
             @RequestParam int uid
     ) {
         if (!accessManager.checkAccessToken(tokenValue, uid)) {
-            return TOKEN_EXPIRED_RESPONSE;
+            return ResponseManager.tokenExpiredResponse;
         }
-        String response;
-        HttpStatus status;
+        ResponseEntity<String> response;
         try {
             int balance = billService.balance(uid);
-            response = String.format(BODY_OK, balance);
-            status = HttpStatus.OK;
+            response = ResponseManager.createResponse(balance);
         } catch (InvalidUserException e) {
-            response = "{\"error_code\" : 2, \"failure_msg\" : \"No such user\"}";
-            status = HttpStatus.BAD_REQUEST;
+            response = ResponseManager.createResponse(e, 2);
         }
-        return new ResponseEntity<>(response, status);
+        return response;
     }
     
 }

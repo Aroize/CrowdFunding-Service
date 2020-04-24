@@ -24,7 +24,7 @@ public class AuthManagerImpl implements AuthManager {
     public User signUp(String login, String password) throws InvalidUserException {
         User users = userService.findByLogin(login);
         if (users != null)
-            throw new InvalidUserException();
+            throw new InvalidUserException("User already exists");
         User user = new User();
         user.setLogin(login);
         user.setHashedPassword(password);
@@ -36,10 +36,10 @@ public class AuthManagerImpl implements AuthManager {
     public AccessToken signIn(String login, String password) throws InvalidUserException {
         User user = userService.findByLogin(login);
         if (user == null) {
-            throw new InvalidUserException();
+            throw new InvalidUserException("No such user");
         }
         if (!user.getHashedPassword().equals(password)) {
-            throw new InvalidPasswordException();
+            throw new InvalidPasswordException("Incorrect password");
         }
         return accessManager.registerTokenForUser(user);
     }

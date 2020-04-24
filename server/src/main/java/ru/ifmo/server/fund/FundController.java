@@ -1,18 +1,15 @@
 package ru.ifmo.server.fund;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.ifmo.server.ResponseManager;
 import ru.ifmo.server.auth.access.AccessManager;
 import ru.ifmo.server.data.entities.Fund;
 
 @RestController
 public class FundController {
-
-    private final static ResponseEntity<String> TOKEN_EXPIRED_RESPONSE =
-            new ResponseEntity<>("{ \"error_code\" : -1, \"failure_msg\" : \"Access token has expired or invalid\" }", HttpStatus.UNAUTHORIZED);
 
     private final AccessManager accessManager;
 
@@ -31,18 +28,15 @@ public class FundController {
             @RequestParam(required = false) Integer limit
     ) {
         if (!accessManager.checkAccessToken(tokenValue, uid)) {
-            return TOKEN_EXPIRED_RESPONSE;
+            return ResponseManager.tokenExpiredResponse;
         }
-        String response;
-        HttpStatus status;
+        ResponseEntity<String> response;
         try {
             final Fund fund = fundManager.create(fundName, uid, limit);
-            response = "{ \"obj\" : \"" + fund + "\" }";
-            status = HttpStatus.OK;
+            response = ResponseManager.createResponse(fund);
         } catch (IllegalFundException e) {
-            response = "BAD";
-            status = HttpStatus.BAD_REQUEST;
+            response = ResponseManager.createResponse(e, 2);
         }
-        return new ResponseEntity<String>(response, status);
+        return response;
     }
 }
