@@ -45,4 +45,27 @@ public class FundController {
         }
         return new ResponseEntity<String>(response, status);
     }
+
+    @GetMapping("/fund.getRaised")
+    public ResponseEntity<String> getRaised(
+        @RequestParam(name = "fund_id", required = false) Integer fundId,
+        @RequestParam(name = "fund_name", required = false) String fundName
+    ) {
+        ResponseEntity<String> response;
+        if (fundId == null && fundName == null) {
+            return ResponseManager.createResponse(new IllegalArgumentException("Must be specified one of this parameters: fund_id or fund_name"), -2);
+        }
+        try {
+            int raised;
+            if (fundId != null) {
+                raised = fundManager.raisedMoney(fundId);
+            } else {
+                raised = fundManager.raisedMoney(fundName);
+            }
+            response = ResponseManager.createResponse(raised);
+        } catch (IllegalFundException e) {
+            response = ResponseManager.createResponse(e, 2);
+        }
+        return response;
+    }
 }

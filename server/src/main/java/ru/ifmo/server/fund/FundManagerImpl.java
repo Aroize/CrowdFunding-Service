@@ -30,4 +30,23 @@ public class FundManagerImpl implements FundManager {
         fund.setName(name);
         return create(fund);
     }
+
+    @Override
+    public int raisedMoney(int fundId) throws IllegalFundException {
+        final Fund fund = fundService.findFundById(fundId);
+        return getFundRaisedMoney(fund);
+    }
+
+    @Override
+    public int raisedMoney(String fundName) throws IllegalFundException {
+        final Fund fund = fundService.findFundByName(fundName);
+        return getFundRaisedMoney(fund);
+    }
+
+    private int getFundRaisedMoney(Fund fund) throws IllegalFundException {
+        if (fund == null) {
+            throw new IllegalFundException("No such fund");
+        }
+        return fund.getRaised();
+    }
 }
