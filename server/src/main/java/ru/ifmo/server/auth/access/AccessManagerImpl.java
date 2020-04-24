@@ -1,6 +1,5 @@
 package ru.ifmo.server.auth.access;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.ifmo.server.data.entities.User;
 
@@ -35,6 +34,7 @@ public class AccessManagerImpl implements AccessManager {
     @Override
     public boolean checkAccessToken(String token, int uid) {
         Optional<AccessToken> accessToken = accessTokenService.findAccessTokenByValue(token, uid);
+        //TODO(Add check for token expiration)
         return accessToken.isPresent();
     }
 

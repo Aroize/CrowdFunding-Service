@@ -30,7 +30,6 @@ public class AccessToken {
         buffer.putLong(time);
         buffer.putLong(time / 2);
         accessToken = MD5Encoder.encode(buffer.array());
-        System.out.println(accessToken);
     }
 
     public AccessToken() {}

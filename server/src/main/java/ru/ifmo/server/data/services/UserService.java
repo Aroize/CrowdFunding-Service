@@ -10,7 +10,9 @@ public interface UserService {
 
     User findByLogin(String login);
 
-    List<User> findById(int id);
+    User findById(int id);
 
     void save(User user);
+
+    User findByIdForEdit(int id);
 }
