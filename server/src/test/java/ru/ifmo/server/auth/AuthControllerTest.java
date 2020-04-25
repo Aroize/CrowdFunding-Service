@@ -34,7 +34,7 @@ public class AuthControllerTest {
             if (!userMap.containsKey(login))
                 throw new InvalidUserException();
             if (!userMap.get(login).getHashedPassword().equals(password))
-                throw new InvalidPasswordException();
+                throw new InvalidPasswordException("Incorrect password");
             return null;
         }
 

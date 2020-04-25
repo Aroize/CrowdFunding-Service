@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.ifmo.server.ResponseManager;
 import ru.ifmo.server.auth.access.AccessToken;
 import ru.ifmo.server.auth.exception.InvalidPasswordException;
 import ru.ifmo.server.auth.exception.InvalidUserException;
@@ -26,40 +27,33 @@ public class AuthController {
 
     @GetMapping("/auth.signUp")
     public ResponseEntity<String> signUp(@RequestParam(name = "login") String login, @RequestParam(name = "hashed_pwd") String password) {
-        String responseBody;
-        HttpStatus status;
+        ResponseEntity<String> response;
         try {
             User user = authManager.signUp(login, password);
-            responseBody = gson.toJson(user);
-            status = HttpStatus.OK;
+            response = ResponseManager.createResponse(user);
         } catch (InvalidUserException e) {
-            responseBody = "{ \"error_code\" : 1, \"failure_msg\" : \"User with this login already exists\"  }";
-            status = HttpStatus.CONFLICT;
+            response = ResponseManager.createResponse(e, 2);
         }
-        return new ResponseEntity<>(responseBody, status);
+        return response;
     }
 
     @GetMapping("/auth.signIn")
     public ResponseEntity<String> signIn(@RequestParam(name = "login") String login, @RequestParam(name = "hashed_pwd") String password) {
-        String responseBody;
-        HttpStatus status;
+        ResponseEntity<String> response;
         try {
             AccessToken accessToken = authManager.signIn(login, password);
-            responseBody = gson.toJson(accessToken);
-            status = HttpStatus.OK;
+            response = ResponseManager.createResponse(accessToken);
         } catch (InvalidPasswordException e) {
-            responseBody = "{\"error_code\" : 1, \"failure_msg\" : \"Password is incorrect\"}";
-            status = HttpStatus.BAD_REQUEST;
+            response = ResponseManager.createResponse(e, 2);
         } catch (InvalidUserException e) {
-            responseBody = "{\"error_code\" : 2, \"failure_msg\" : \"No such user\"}";
-            status = HttpStatus.BAD_REQUEST;
+            response = ResponseManager.createResponse(e, 3);
         }
-        return new ResponseEntity<>(responseBody, status);
+        return response;
     }
 
     @GetMapping("/auth.logout")
     public ResponseEntity<String> logout(@RequestParam(name = "token") String token, @RequestParam(name = "uid") int uid) {
         authManager.logout(token, uid);
-        return new ResponseEntity<>("{ \"response\" : 1 }", HttpStatus.OK);
+        return ResponseManager.simpleResponse;
     }
 }

@@ -30,14 +30,21 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> findById(int id) {
+    public User findById(int id) {
         ArrayList<User> result = new ArrayList<>();
         userRepository.findUserById(id).forEach(result::add);
-        return result;
+        if (result.isEmpty())
+            return null;
+        return result.get(0);
     }
 
     @Override
     public void save(User user) {
         userRepository.save(user);
+    }
+
+    @Override
+    public User findByIdForEdit(int id) {
+        return userRepository.findByIdForEdit(id);
     }
 }
