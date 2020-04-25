@@ -57,7 +57,7 @@ public class AuthControllerTest {
         for (String userName : userNames) {
             ResponseEntity<String> response = authController.signUp(userName, userName);
             assert response.getBody() != null;
-            assert response.getBody().contains("1");
+            assert response.getBody().contains("2");
         }
     }
 
@@ -71,12 +71,12 @@ public class AuthControllerTest {
         for (String userName : userNames) {
             ResponseEntity<String> response = authController.signIn(userName, userName);
             assert response.getBody() != null;
-            assert response.getBody().contains("1");
+            assert response.getBody().contains("2");
         }
         for (String pwd : pwds) {
             ResponseEntity<String> response = authController.signIn(pwd, pwd);
             assert response.getBody() != null;
-            assert response.getBody().contains("2");
+            assert response.getBody().contains("3");
         }
     }
 
