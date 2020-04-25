@@ -34,8 +34,10 @@ public class AccessManagerImpl implements AccessManager {
     @Override
     public boolean checkAccessToken(String token, int uid) {
         Optional<AccessToken> accessToken = accessTokenService.findAccessTokenByValue(token, uid);
-        //TODO(Add check for token expiration)
-        return accessToken.isPresent();
+        if (!accessToken.isPresent())
+            return false;
+        long tokenExpiresTime = accessToken.get().getExpires().getTime();
+        return System.currentTimeMillis() < tokenExpiresTime;
     }
 
     @Override
