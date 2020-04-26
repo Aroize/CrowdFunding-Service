@@ -49,7 +49,7 @@ public class ResponseManager {
         final StringBuilder builder = new StringBuilder();
         builder.append("{ ");
         builder.append(jsonElements.get(JSON_ELEMENTS.ERROR_CODE)).append(errorCode).append(',');
-        builder.append(jsonElements.get(JSON_ELEMENTS.FAILURE_MSG)).append(e.getMessage());
+        builder.append(jsonElements.get(JSON_ELEMENTS.FAILURE_MSG)).append('"').append(e.getMessage()).append('"');
         return new ResponseEntity<>(builder.append(" }").toString(), HttpStatus.BAD_REQUEST);
     }
 }
