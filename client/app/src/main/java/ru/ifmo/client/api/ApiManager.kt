@@ -1,7 +1,6 @@
 package ru.ifmo.client.api
 
 import org.json.JSONObject
-import java.lang.IllegalStateException
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
 import java.util.function.Supplier
@@ -10,7 +9,7 @@ object ApiManager {
 
     private val executor = Executors.newSingleThreadExecutor()
 
-    fun <T> executeSync(request: ApiRequest<T>): T {
+    fun <T> executeSync(request: ApiCommand<T>): T {
         try {
             var response = request.execute()
             response = handleResponse<T>(response, null, null)
@@ -43,7 +42,7 @@ object ApiManager {
 
     private fun <T> validateResult(
         result: String,
-        request: ApiRequest<T>,
+        request: ApiCommand<T>,
         callback: ApiCallback<T>?
     ): T? {
         val response = JSONObject(result)
