@@ -7,7 +7,7 @@ import org.json.JSONObject
 import java.lang.Exception
 import java.lang.RuntimeException
 
-abstract class ApiRequest<T>(private val method: String) : ApiCommand<T> {
+abstract class ApiRequest<T>(override val method: String) : ApiCommand<T> {
 
     private val parameters: MutableMap<String, String> = HashMap()
 

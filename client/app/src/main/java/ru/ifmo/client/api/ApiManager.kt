@@ -1,6 +1,8 @@
 package ru.ifmo.client.api
 
+import android.util.Log
 import org.json.JSONObject
+import ru.ifmo.client.data.models.User
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
 import java.util.function.Supplier
@@ -9,6 +11,15 @@ object ApiManager {
 
     private val executor = Executors.newSingleThreadExecutor()
 
+    var cachedInfo: Pair<String, String> = Pair("", "")
+        private set
+
+    var accessToken = AccessToken()
+        private set
+
+    /**
+     * If you use sync method - it is your obligation to control access token expiration
+     */
     fun <T> executeSync(request: ApiCommand<T>): T {
         try {
             var response = request.execute()
@@ -20,14 +31,42 @@ object ApiManager {
         throw IllegalStateException("Exception must be thrown")
     }
 
-    fun <T> execute(request: ApiRequest<T>, callback: ApiCallback<T>) {
-        CompletableFuture
-            .supplyAsync (Supplier { request.execute() }, executor)
-            .handle { response, e -> handleResponse(response, e, callback) }
-            .thenAccept { result -> validateResult(result, request, callback) }
+    fun <T> execute(request: ApiCommand<T>, callback: ApiCallback<T>) {
+        if (verifyRequest(request)) {
+            CompletableFuture
+                .supplyAsync(Supplier { request.execute() }, executor)
+                .handle { response, e -> handleResponse(response, e, callback) }
+                .thenAccept { result -> validateResult(result, request, callback) }
+        }
+        else {
+            val callbackForExecution = object : ApiCallback<AccessToken> {
+                override fun onError(e: Throwable) {
+                    callback.onError(e)
+                }
+
+                override fun onSuccess(result: AccessToken) {
+                    execute(request, callback)
+                }
+            }
+            signIn(cachedInfo.first, cachedInfo.second, callbackForExecution)
+        }
+    }
+
+    @Throws(UnsupportedApiMethod::class)
+    private fun <T> verifyRequest(request: ApiCommand<T>): Boolean {
+        if (request.method !in ApiConfig.supportedMethods)
+            throw UnsupportedApiMethod("${request.method} is not supported")
+        if (request.method in ApiConfig.requiresToken && request is ApiRequest<T>) {
+            //Check whether access token is available and if it is expired sign in again
+            if (accessToken.expireTime < System.currentTimeMillis())
+                return false
+            request.addParam("token", accessToken.tokenValue)
+        }
+        return true
     }
 
     private fun <T> handleResponse(response: String?, e: Throwable?, callback: ApiCallback<T>?): String {
+        Log.d("TEST", "HANDLE RESPONSE $response $e $callback")
         if (response == null && e != null) {
             if (callback != null)
                 callback.onError(e)
@@ -35,7 +74,6 @@ object ApiManager {
                 throw e
         } else {
             return response as String
-
         }
         return ""
     }
@@ -60,5 +98,33 @@ object ApiManager {
             return parsed
         }
         return null
+    }
+
+    /**
+     * @param password Must be MD5 Hashed password
+     * @param login User's login
+     */
+    fun signIn(login: String, password: String, callback: ApiCallback<AccessToken>) {
+        val request = SignInRequest(login, password)
+        val localCallback = object : ApiCallback<AccessToken> {
+            override fun onError(e: Throwable) = callback.onError(e)
+
+            override fun onSuccess(result: AccessToken) {
+                accessToken = result
+                //Save user info for next token expiration re-login
+                cachedInfo = login to password
+                callback.onSuccess(accessToken)
+            }
+        }
+        execute(request, localCallback)
+    }
+
+    /**
+     * @param password Must be MD5 Hashed password
+     * @param login User's login
+     */
+    fun signUp(login: String, password: String, callback: ApiCallback<User>) {
+        val request = SignUpRequest(login, password)
+        execute(request, callback)
     }
 }
