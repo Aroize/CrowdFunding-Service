@@ -8,4 +8,16 @@ object ApiConfig {
 
     const val PORT = 8080
 
+    val supportedMethods = HashSet<String>().apply {
+        add("auth.signUp")
+        add("auth.signIn")
+        add("auth.logout")
+        add("bill.userAddAmount")
+        add("bill.donate")
+        add("bill.getBalance")
+        add("fund.create")
+        add("fund.getRaised")
+    }
+
+    val requiresToken = supportedMethods.subtract(listOf("auth.signUp", "auth.signIn", "fund.getRaised"))
 }
