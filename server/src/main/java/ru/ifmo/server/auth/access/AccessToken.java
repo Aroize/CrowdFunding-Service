@@ -17,14 +17,14 @@ public class AccessToken {
     @Column(name = "user_id")
     private int userId;
 
-    private Date expires;
+    private long expires;
 
     @Column(name = "access_token")
     private String accessToken;
 
     public AccessToken(int userId, Date expires) {
         this.userId = userId;
-        this.expires = expires;
+        this.expires = expires.getTime();
         long time = expires.getTime();
         ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES * 2);
         buffer.putLong(time);
@@ -38,7 +38,7 @@ public class AccessToken {
         this.accessToken = accessToken;
     }
 
-    public void setExpires(Date expires) {
+    public void setExpires(long expires) {
         this.expires = expires;
     }
 
@@ -50,8 +50,8 @@ public class AccessToken {
         return userId;
     }
 
-    public Date getExpires() {
-        return (Date)expires.clone();
+    public long getExpires() {
+        return expires;
     }
 
     public String getAccessToken() {

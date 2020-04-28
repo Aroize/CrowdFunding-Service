@@ -36,7 +36,7 @@ public class AccessManagerImpl implements AccessManager {
         Optional<AccessToken> accessToken = accessTokenService.findAccessTokenByValue(token, uid);
         if (!accessToken.isPresent())
             return false;
-        long tokenExpiresTime = accessToken.get().getExpires().getTime();
+        long tokenExpiresTime = accessToken.get().getExpires();
         return System.currentTimeMillis() < tokenExpiresTime;
     }
 

@@ -1,6 +1,5 @@
 package ru.ifmo.client.api
 
-import android.util.Log
 import org.json.JSONObject
 import ru.ifmo.client.data.models.User
 import java.util.concurrent.CompletableFuture
@@ -62,7 +61,7 @@ object ApiManager {
             throw UnsupportedApiMethod("${request.method} is not supported")
         if (request.method in ApiConfig.requiresToken && request is ApiRequest<T>) {
             //Check whether access token is available and if it is expired sign in again
-            if (accessToken.expireTime < System.currentTimeMillis())
+            if (accessToken.expireTime <= System.currentTimeMillis())
                 return false
             request.addParam("token", accessToken.tokenValue)
         }
