@@ -4,12 +4,13 @@ import android.util.Log
 import org.json.JSONObject
 import ru.ifmo.client.data.models.User
 import java.util.concurrent.CompletableFuture
-import java.util.concurrent.Executors
-import java.util.function.Supplier
+import java.util.function.Function
 
 object ApiManager {
 
-    private val executor = Executors.newSingleThreadExecutor()
+    private const val TAG = "ApiManager.Tag"
+
+    private val mainExecutor = UIThreadExecutor()
 
     var cachedInfo: Pair<String, String> = Pair("", "")
         private set
@@ -33,20 +34,23 @@ object ApiManager {
 
     fun <T> execute(request: ApiCommand<T>, callback: ApiCallback<T>) {
         if (verifyRequest(request)) {
+            Log.d(TAG, "request is verified")
             CompletableFuture
-                .supplyAsync(Supplier { request.execute() }, executor)
-                .handle { response, e -> handleResponse(response, e, callback) }
-                .thenAccept { result -> validateResult(result, request, callback) }
+                .supplyAsync { request.execute() }
+                .thenApplyAsync (Function<String, String>{ response -> response }, mainExecutor)
+                .whenComplete { response, e ->
+                    Log.d(TAG, "request completed with response=$response exception=$e")
+                    val handled = handleResponse(response, e, callback)
+                    if (handled.isNotEmpty())
+                        validateResult(handled, request, callback)
+                }
         }
         else {
+            Log.d(TAG, "request verification failed")
             val callbackForExecution = object : ApiCallback<AccessToken> {
-                override fun onError(e: Throwable) {
-                    callback.onError(e)
-                }
+                override fun onError(e: Throwable) = callback.onError(e)
 
-                override fun onSuccess(result: AccessToken) {
-                    execute(request, callback)
-                }
+                override fun onSuccess(result: AccessToken) = execute(request, callback)
             }
             signIn(cachedInfo.first, cachedInfo.second, callbackForExecution)
         }
@@ -66,7 +70,6 @@ object ApiManager {
     }
 
     private fun <T> handleResponse(response: String?, e: Throwable?, callback: ApiCallback<T>?): String {
-        Log.d("TEST", "HANDLE RESPONSE $response $e $callback")
         if (response == null && e != null) {
             if (callback != null)
                 callback.onError(e)
@@ -83,10 +86,12 @@ object ApiManager {
         request: ApiCommand<T>,
         callback: ApiCallback<T>?
     ): T? {
+        Log.d(TAG, "response validation ---> $result")
         val response = JSONObject(result)
         if (response.has("error_code")) {
             //Server returned error response
             //We should wrap it and send out exception
+            Log.d(TAG, "response has error code")
             val e = ApiException(response.getString("failure_msg"))
             if (callback != null)
                 callback.onError(e)
@@ -94,6 +99,7 @@ object ApiManager {
                 throw e
         } else {
             val parsed = request.parse(response)
+            Log.d(TAG, "response is parsed = $response")
             callback?.onSuccess(parsed)
             return parsed
         }
@@ -107,7 +113,7 @@ object ApiManager {
     fun signIn(login: String, password: String, callback: ApiCallback<AccessToken>) {
         val request = SignInRequest(login, password)
         val localCallback = object : ApiCallback<AccessToken> {
-            override fun onError(e: Throwable) = callback.onError(e)
+            override fun onError(e: Throwable)  = callback.onError(e)
 
             override fun onSuccess(result: AccessToken) {
                 accessToken = result
@@ -118,6 +124,8 @@ object ApiManager {
         }
         execute(request, localCallback)
     }
+
+    fun isSignIn() = accessToken.tokenValue.isNotEmpty()
 
     /**
      * @param password Must be MD5 Hashed password

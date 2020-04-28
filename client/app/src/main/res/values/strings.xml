@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">client</string>
+    <string name="login">Ваш логин</string>
+    <string name="password">Ваш пароль</string>
+    <string name="sign_in">Войти</string>
+    <string name="sign_up">Зарегестрироваться</string>
+    <string name="sign_up_title">Регистрация</string>
+    <string name="password_repeat">Повторите пароль</string>
+    <string name="repeat_must_equals">Пароли должны совпадать!</string>
 </resources>
