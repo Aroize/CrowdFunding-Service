@@ -7,4 +7,6 @@
     <string name="sign_up_title">Регистрация</string>
     <string name="password_repeat">Повторите пароль</string>
     <string name="repeat_must_equals">Пароли должны совпадать!</string>
+    <string name="account">Account Button</string>
+    <string name="fund">Funds Button</string>
 </resources>
