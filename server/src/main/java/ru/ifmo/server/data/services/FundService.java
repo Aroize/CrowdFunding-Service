@@ -13,5 +13,7 @@ public interface FundService {
 
     List<Fund> findFundsByOwner(int ownerId);
 
+    List<Fund> getFunds(int count);
+
     Fund findFundByName(String name);
 }
