@@ -1,3 +1,5 @@
 package ru.ifmo.client.domain.mvp
 
-interface MvpView
+interface MvpView {
+    fun showErrorMessage(message: String)
+}

@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import kotlinx.android.synthetic.main.activity_navigation.*
 import ru.ifmo.client.R
 import ru.ifmo.client.presentation.fragment.AccountFragment
 import ru.ifmo.client.presentation.fragment.FundsFragment
@@ -17,7 +18,9 @@ class NavigationActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_navigation)
+        supportActionBar?.hide()
         initViews()
+        fragment_container.post { showAccountFragment() }
     }
 
     private fun initViews() {
@@ -41,5 +44,7 @@ class NavigationActivity : AppCompatActivity() {
 
     companion object {
         fun createIntent(packageContext: Context) = Intent(packageContext, NavigationActivity::class.java)
+
+        const val TAG = "NavigationActivity.Tag"
     }
 }

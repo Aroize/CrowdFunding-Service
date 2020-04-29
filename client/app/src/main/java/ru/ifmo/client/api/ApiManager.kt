@@ -1,5 +1,6 @@
 package ru.ifmo.client.api
 
+import android.util.Log
 import org.json.JSONObject
 import ru.ifmo.client.data.models.User
 import java.util.concurrent.CompletableFuture

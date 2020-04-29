@@ -9,4 +9,8 @@
     <string name="repeat_must_equals">Пароли должны совпадать!</string>
     <string name="account">Account Button</string>
     <string name="fund">Funds Button</string>
+    <string name="balance">Баланс:</string>
+    <string name="add_chips">Добавить на счет</string>
+    <string name="your_funds">Ваши фонды</string>
+    <string name="negative_amount">Число должно быть положительным</string>
 </resources>
