@@ -1,3 +1,26 @@
 <resources>
     <string name="app_name">client</string>
+    <string name="login">Ваш логин</string>
+    <string name="password">Ваш пароль</string>
+    <string name="sign_in">Войти</string>
+    <string name="sign_up">Зарегестрироваться</string>
+    <string name="sign_up_title">Регистрация</string>
+    <string name="password_repeat">Повторите пароль</string>
+    <string name="repeat_must_equals">Пароли должны совпадать!</string>
+    <string name="account">Account Button</string>
+    <string name="fund">Funds Button</string>
+    <string name="balance">Баланс:</string>
+    <string name="add_chips">Добавить на счет</string>
+    <string name="your_funds">Ваши фонды</string>
+    <string name="negative_amount">Число должно быть положительным</string>
+    <string name="funds">Фонды</string>
+    <string name="fund_name">Название фонда</string>
+    <string name="turn_on_limits">Использовать лимит</string>
+    <string name="create_fund">Создать фонд</string>
+    <string name="must_specify_fund_name">Имя фонда должно быть указано</string>
+    <string name="donate">Пожертвовать</string>
+    <string name="raised">"Собрано: "</string>
+    <string name="limit">"Лимит: "</string>
+    <string name="no">Нет</string>
+    <string name="not_enough_money">Недостаточно средств</string>
 </resources>

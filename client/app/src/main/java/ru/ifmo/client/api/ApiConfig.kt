@@ -17,7 +17,17 @@ object ApiConfig {
         add("bill.getBalance")
         add("fund.create")
         add("fund.getRaised")
+        add("fund.get")
+        add("user.get")
+        add("user.funds")
     }
 
-    val requiresToken = supportedMethods.subtract(listOf("auth.signUp", "auth.signIn", "fund.getRaised"))
+    val requiresToken = supportedMethods.subtract(
+        listOf(
+            "auth.signUp",
+            "auth.signIn",
+            "fund.getRaised",
+            "fund.get"
+        )
+    )
 }
