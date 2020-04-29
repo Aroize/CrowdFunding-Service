@@ -33,7 +33,12 @@ public class FundServiceImpl implements FundService {
 
     @Override
     public List<Fund> findFundsByOwner(int ownerId) {
-        return new ArrayList<>(fundRepository.findFundByOwnerId(ownerId));
+        return new ArrayList<>(fundRepository.findFundsByOwnerId(ownerId));
+    }
+
+    @Override
+    public List<Fund> getFunds(int count, int offset) {
+        return new ArrayList<>(fundRepository.getFunds(count, offset));
     }
 
     @Override

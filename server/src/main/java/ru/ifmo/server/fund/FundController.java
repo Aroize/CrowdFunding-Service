@@ -8,8 +8,12 @@ import ru.ifmo.server.ResponseManager;
 import ru.ifmo.server.auth.access.AccessManager;
 import ru.ifmo.server.data.entities.Fund;
 
+import java.util.List;
+
 @RestController
 public class FundController {
+
+    private final int DEFAULT_COUNT = 20;
 
     private final AccessManager accessManager;
 
@@ -61,5 +65,26 @@ public class FundController {
             response = ResponseManager.createResponse(e, 2);
         }
         return response;
+    }
+
+    @GetMapping("/fund.get")
+    public ResponseEntity<String> getFunds(
+        @RequestParam(name = "count", required = false) Integer count,
+        @RequestParam(name = "offset", required = false) Integer offset
+    ) {
+        if (count == null) {
+            count = DEFAULT_COUNT;
+        }
+        if (count < 0) {
+            return ResponseManager.createResponse(new IllegalArgumentException("Count must be positive"), 2);
+        }
+        if (offset == null) {
+            offset = 0;
+        }
+        if (offset < 0) {
+            return ResponseManager.createResponse(new IllegalArgumentException("Offset must be positive"), 3);
+        }
+        List<Fund> funds = fundManager.getFunds(count, offset);
+        return ResponseManager.createResponse(funds);
     }
 }

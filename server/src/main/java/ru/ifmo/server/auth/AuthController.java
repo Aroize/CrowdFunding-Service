@@ -1,7 +1,6 @@
 package ru.ifmo.server.auth;
 
 import com.google.gson.Gson;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,8 +15,6 @@ import ru.ifmo.server.data.entities.User;
 @RestController
 @Component
 public class AuthController {
-
-    private final Gson gson = new Gson();
 
     private final AuthManager authManager;
 

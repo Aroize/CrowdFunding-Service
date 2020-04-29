@@ -4,6 +4,8 @@ import org.springframework.stereotype.Component;
 import ru.ifmo.server.data.entities.Fund;
 import ru.ifmo.server.data.services.FundService;
 
+import java.util.List;
+
 @Component
 public class FundManagerImpl implements FundManager {
 
@@ -41,6 +43,16 @@ public class FundManagerImpl implements FundManager {
     public int raisedMoney(String fundName) throws IllegalFundException {
         final Fund fund = fundService.findFundByName(fundName);
         return getFundRaisedMoney(fund);
+    }
+
+    @Override
+    public List<Fund> findFundsByOwner(int id) {
+        return fundService.findFundsByOwner(id);
+    }
+
+    @Override
+    public List<Fund> getFunds(int count, int offset) {
+        return fundService.getFunds(count, offset);
     }
 
     private int getFundRaisedMoney(Fund fund) throws IllegalFundException {
