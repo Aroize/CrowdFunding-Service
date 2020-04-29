@@ -14,7 +14,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".presentation.activity.NavigationActivity"/>
+        <activity
+            android:noHistory="true"
+            android:name=".presentation.activity.NavigationActivity"/>
         <activity
             android:name=".presentation.activity.AuthActivity"
             android:noHistory="true"

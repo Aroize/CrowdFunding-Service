@@ -7,6 +7,8 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_navigation.*
 import ru.ifmo.client.R
+import ru.ifmo.client.api.ApiCallback
+import ru.ifmo.client.api.ApiManager
 import ru.ifmo.client.presentation.fragment.AccountFragment
 import ru.ifmo.client.presentation.fragment.FundsFragment
 
@@ -40,6 +42,19 @@ class NavigationActivity : AppCompatActivity() {
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, AccountFragment())
             .commitNow()
+    }
+
+    fun logout() {
+        val callback = object : ApiCallback<Unit> {
+            override fun onError(e: Throwable) = goToSignIn()
+
+            override fun onSuccess(result: Unit) = goToSignIn()
+        }
+        ApiManager.logout(callback)
+    }
+
+    private fun goToSignIn() {
+        startActivity(AuthActivity.createIntent(this))
     }
 
     companion object {

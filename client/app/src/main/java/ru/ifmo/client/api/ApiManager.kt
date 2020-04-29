@@ -2,6 +2,7 @@ package ru.ifmo.client.api
 
 import android.util.Log
 import org.json.JSONObject
+import ru.ifmo.client.App
 import ru.ifmo.client.data.models.User
 import java.util.concurrent.CompletableFuture
 import java.util.function.Function
@@ -34,7 +35,7 @@ object ApiManager {
 
     fun <T> execute(request: ApiCommand<T>, callback: ApiCallback<T>) {
         if (verifyRequest(request)) {
-            Log.d(TAG, "request is verified")
+            Log.d(TAG, "request is verified ${request.method}")
             CompletableFuture
                 .supplyAsync { request.execute() }
                 .thenApplyAsync (Function<String, String>{ response -> response }, mainExecutor)
@@ -125,7 +126,7 @@ object ApiManager {
         execute(request, localCallback)
     }
 
-    fun isSignIn() = accessToken.tokenValue.isNotEmpty()
+    fun isSignIn() = accessToken.tokenValue.isNotBlank()
 
     /**
      * @param password Must be MD5 Hashed password
@@ -134,5 +135,18 @@ object ApiManager {
     fun signUp(login: String, password: String, callback: ApiCallback<User>) {
         val request = SignUpRequest(login, password)
         execute(request, callback)
+    }
+
+    fun logout(callback: ApiCallback<Unit>) {
+        val request = LogoutRequest(App.user.uid)
+        val localCallback = object : ApiCallback<Int> {
+            override fun onError(e: Throwable) = callback.onError(e)
+
+            override fun onSuccess(result: Int) {
+                accessToken = AccessToken()
+                callback.onSuccess(Unit)
+            }
+        }
+        execute(request, localCallback)
     }
 }

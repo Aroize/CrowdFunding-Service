@@ -17,6 +17,7 @@ import ru.ifmo.client.R
 import ru.ifmo.client.data.models.Fund
 import ru.ifmo.client.data.models.User
 import ru.ifmo.client.domain.donation.DonateListener
+import ru.ifmo.client.presentation.activity.NavigationActivity
 import ru.ifmo.client.presentation.presenter.AccountPresenter
 import ru.ifmo.client.presentation.presenter.AccountView
 import ru.ifmo.client.presentation.recycler.FundAdapter
@@ -30,6 +31,7 @@ class AccountFragment : Fragment(), AccountView, DonateListener {
     private lateinit var balanceTextView: TextView
     private lateinit var addChipsBtn: Button
     private lateinit var fundsRecyclerView: RecyclerView
+    private lateinit var logoutBtn: View
     private val adapter = FundAdapter(this)
 
     override fun onCreateView(
@@ -49,8 +51,13 @@ class AccountFragment : Fragment(), AccountView, DonateListener {
         addChipsBtn.setOnClickListener {
             showDialog()
         }
+        logoutBtn = mainView.findViewById(R.id.logout_btn)
+        logoutBtn.setOnClickListener {
+            (activity as NavigationActivity).logout()
+        }
         fundsRecyclerView = mainView.findViewById(R.id.user_funds)
         fundsRecyclerView.adapter = adapter
+
     }
 
     private fun showDialog() {
