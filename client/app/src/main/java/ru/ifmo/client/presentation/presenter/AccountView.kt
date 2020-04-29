@@ -8,7 +8,8 @@ interface AccountView : MvpView {
     fun showUserInfo(user: User)
 
     fun showUserFunds(
-        funds: List<Fund>,
-        addCount: Int
+        funds: List<Fund>
     )
+
+    fun updateFund(fund: Fund)
 }

@@ -27,7 +27,7 @@ class SignUpFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        mainView = layoutInflater.inflate(R.layout.fragment_sign_up, container, false)
+        mainView = inflater.inflate(R.layout.fragment_sign_up, container, false)
         initViews()
         return mainView
     }

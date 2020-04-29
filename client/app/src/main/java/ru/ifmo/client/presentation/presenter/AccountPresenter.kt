@@ -7,6 +7,7 @@ import ru.ifmo.client.api.ApiManager
 import ru.ifmo.client.data.models.Fund
 import ru.ifmo.client.data.models.User
 import ru.ifmo.client.data.requests.AddAmountRequest
+import ru.ifmo.client.data.requests.DonateRequest
 import ru.ifmo.client.data.requests.UserFundsRequest
 import ru.ifmo.client.data.requests.UserGetRequest
 import ru.ifmo.client.domain.mvp.BasePresenter
@@ -27,12 +28,11 @@ class AccountPresenter : BasePresenter<AccountView>() {
         } else {
             viewState?.showUserInfo(cachedUser)
             //User is cached so need to check his funds
-            if (cachedFunds.isEmpty()) {
+            if (cachedFunds.isNotEmpty()) {
                 //Maybe user has funds
-                requestUserFunds()
-            } else {
-                viewState?.showUserFunds(cachedFunds, cachedFunds.size)
+                viewState?.showUserFunds(cachedFunds)
             }
+            requestUserFunds()
         }
     }
 
@@ -44,9 +44,8 @@ class AccountPresenter : BasePresenter<AccountView>() {
 
             override fun onSuccess(result: List<Fund>) {
                 Log.d(TAG, "successfully got user's funds. count = ${result.size}")
-                val savedSize = cachedFunds.size
-                cachedFunds = ArrayList(cachedFunds.union(result))
-                viewState?.showUserFunds(cachedFunds, cachedFunds.size - savedSize)
+                cachedFunds = result as ArrayList<Fund>
+                viewState?.showUserFunds(cachedFunds)
             }
         }
         val request = UserFundsRequest(cachedUser.uid)
@@ -93,9 +92,26 @@ class AccountPresenter : BasePresenter<AccountView>() {
     }
 
     private fun handleRequestError(methodName: String, e: Throwable) {
-        Log.d(TAG, "Exception while running method\"$methodName\" request; message=${e.message}", e)
+        Log.d(TAG, "Exception while running method \"$methodName\" request; message=${e.message}", e)
         val message = e.message
         if (message != null)
             viewState?.showErrorMessage(message)
+    }
+
+    fun donate(amount: Int, fund: Fund) {
+        val request = DonateRequest(ApiManager.accessToken.userId, amount, fund.id)
+        val callback = object : ApiCallback<Int> {
+            override fun onError(e: Throwable) {
+                handleRequestError("donate", e)
+            }
+
+            override fun onSuccess(result: Int) {
+                cachedUser.balance -= amount
+                fund.raised += amount
+                viewState?.updateFund(fund)
+                viewState?.showUserInfo(cachedUser)
+            }
+        }
+        ApiManager.execute(request, callback)
     }
 }

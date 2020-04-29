@@ -27,7 +27,7 @@ class SignInFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        mainView = layoutInflater.inflate(R.layout.fragment_sign_in, container, false)
+        mainView = inflater.inflate(R.layout.fragment_sign_in, container, false)
         initViews()
         return mainView
     }

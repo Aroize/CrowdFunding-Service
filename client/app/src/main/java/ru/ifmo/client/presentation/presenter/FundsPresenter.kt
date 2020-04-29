@@ -1,10 +1,12 @@
 package ru.ifmo.client.presentation.presenter
 
 import android.util.Log
+import ru.ifmo.client.App
 import ru.ifmo.client.api.ApiCallback
 import ru.ifmo.client.api.ApiManager
 import ru.ifmo.client.data.models.Fund
 import ru.ifmo.client.data.requests.CreateFundRequest
+import ru.ifmo.client.data.requests.DonateRequest
 import ru.ifmo.client.data.requests.FundsGetRequest
 import ru.ifmo.client.domain.mvp.BasePresenter
 import ru.ifmo.client.presentation.activity.NavigationActivity.Companion.TAG
@@ -16,12 +18,13 @@ class FundsPresenter : BasePresenter<FundsView>() {
     private var cachedFunds = arrayListOf<Fund>()
 
     override fun onAttach() {
-        if (cachedFunds.isEmpty()) {
-            requestFunds()
+        if (cachedFunds.isNotEmpty()) {
+            viewState?.showFunds(cachedFunds)
         }
+        requestFunds()
     }
 
-    private fun requestFunds(count: Int = 20, offset: Int = 0) {
+    fun requestFunds(count: Int = 20, offset: Int = 0) {
         val request = FundsGetRequest(count, offset)
         val callback = object : ApiCallback<List<Fund>> {
             override fun onError(e: Throwable) {
@@ -30,9 +33,8 @@ class FundsPresenter : BasePresenter<FundsView>() {
 
             override fun onSuccess(result: List<Fund>) {
                 Log.d(TAG, "successfully got funds. count = ${result.size}")
-                val savedSize = cachedFunds.size
-                cachedFunds = ArrayList(cachedFunds.union(result))
-                viewState?.showFunds(cachedFunds, cachedFunds.size - savedSize)
+                cachedFunds = result as ArrayList<Fund>
+                viewState?.showFunds(cachedFunds)
             }
         }
         ApiManager.execute(request, callback)
@@ -50,7 +52,7 @@ class FundsPresenter : BasePresenter<FundsView>() {
                 viewState?.addCreatedFund(result)
             }
         }
-
+        ApiManager.execute(request, callback)
     }
 
     override fun onDetach() {
@@ -58,9 +60,25 @@ class FundsPresenter : BasePresenter<FundsView>() {
     }
 
     private fun handleRequestError(methodName: String, e: Throwable) {
-        Log.d(TAG, "Exception while running method\"$methodName\" request; message=${e.message}", e)
+        Log.d(TAG, "Exception while running method \"$methodName\" request; message=${e.message}", e)
         val message = e.message
         if (message != null)
             viewState?.showErrorMessage(message)
+    }
+
+    fun donate(amount: Int, fund: Fund) {
+        val request = DonateRequest(ApiManager.accessToken.userId, amount, fund.id)
+        val callback = object : ApiCallback<Int> {
+            override fun onError(e: Throwable) {
+                handleRequestError("donate", e)
+            }
+
+            override fun onSuccess(result: Int) {
+                App.user.balance -= amount
+                fund.raised += amount
+                viewState?.updateFund(fund)
+            }
+        }
+        ApiManager.execute(request, callback)
     }
 }
