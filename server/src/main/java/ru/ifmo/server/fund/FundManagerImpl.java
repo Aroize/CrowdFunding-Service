@@ -1,7 +1,6 @@
 package ru.ifmo.server.fund;
 
 import org.springframework.stereotype.Component;
-import ru.ifmo.server.auth.exception.InvalidUserException;
 import ru.ifmo.server.data.entities.Fund;
 import ru.ifmo.server.data.services.FundService;
 
@@ -52,8 +51,8 @@ public class FundManagerImpl implements FundManager {
     }
 
     @Override
-    public List<Fund> getFunds(int count) {
-        return fundService.getFunds(count);
+    public List<Fund> getFunds(int count, int offset) {
+        return fundService.getFunds(count, offset);
     }
 
     private int getFundRaisedMoney(Fund fund) throws IllegalFundException {

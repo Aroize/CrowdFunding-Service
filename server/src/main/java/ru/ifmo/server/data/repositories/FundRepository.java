@@ -21,7 +21,7 @@ public interface FundRepository extends CrudRepository<Fund, Integer> {
     @Query(value = "SELECT * FROM funds WHERE owner_id = :id", nativeQuery = true)
     Collection<Fund> findFundsByOwnerId(@Param("id") int id);
 
-    @Query(value = "SELECT * FROM funds ORDER BY name LIMIT :count", nativeQuery = true)
-    Collection<Fund> getFunds(@Param("count") int count);
+    @Query(value = "SELECT * FROM funds ORDER BY name LIMIT :offset, :count", nativeQuery = true)
+    Collection<Fund> getFunds(@Param("count") int count, @Param("offset") int offset);
 
 }
