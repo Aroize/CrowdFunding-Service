@@ -48,7 +48,6 @@ class FundsPresenter : BasePresenter<FundsView>() {
             }
 
             override fun onSuccess(result: Fund) {
-                cachedFunds.add(0, result)
                 viewState?.addCreatedFund(result)
             }
         }
