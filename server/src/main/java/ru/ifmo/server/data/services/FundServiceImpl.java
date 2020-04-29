@@ -37,8 +37,8 @@ public class FundServiceImpl implements FundService {
     }
 
     @Override
-    public List<Fund> getFunds(int count) {
-        return new ArrayList<>(fundRepository.getFunds(count));
+    public List<Fund> getFunds(int count, int offset) {
+        return new ArrayList<>(fundRepository.getFunds(count, offset));
     }
 
     @Override

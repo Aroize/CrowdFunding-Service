@@ -69,7 +69,8 @@ public class FundController {
 
     @GetMapping("/fund.get")
     public ResponseEntity<String> getFunds(
-        @RequestParam(name = "count", required = false) Integer count
+        @RequestParam(name = "count", required = false) Integer count,
+        @RequestParam(name = "offset", required = false) Integer offset
     ) {
         if (count == null) {
             count = DEFAULT_COUNT;
@@ -77,7 +78,13 @@ public class FundController {
         if (count < 0) {
             return ResponseManager.createResponse(new IllegalArgumentException("Count must be positive"), 2);
         }
-        List<Fund> funds = fundManager.getFunds(count);
+        if (offset == null) {
+            offset = 0;
+        }
+        if (offset < 0) {
+            return ResponseManager.createResponse(new IllegalArgumentException("Offset must be positive"), 3);
+        }
+        List<Fund> funds = fundManager.getFunds(count, offset);
         return ResponseManager.createResponse(funds);
     }
 }

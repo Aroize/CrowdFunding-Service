@@ -15,5 +15,5 @@ public interface FundManager {
 
     List<Fund> findFundsByOwner(int id);
 
-    List<Fund> getFunds(int count);
+    List<Fund> getFunds(int count, int offset);
 }
